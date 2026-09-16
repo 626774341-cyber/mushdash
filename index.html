@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MushDash · 蘑菇冲刺</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="game" width="1280" height="720"></canvas>
+  <button id="muteBtn" title="音乐开关">🔊</button>
+
+  <!-- 标题界面 -->
+  <div id="titleScreen" class="screen">
+    <div class="logo">
+      <h1>Mush<span>Dash</span></h1>
+      <p class="subtitle">🍄 蘑菇冲刺 · 节奏跑酷 🎵</p>
+    </div>
+    <div class="diff-picker">
+      <button class="diff-btn" data-diff="easy">轻松<span>EASY</span></button>
+      <button class="diff-btn selected" data-diff="normal">普通<span>NORMAL</span></button>
+      <button class="diff-btn" data-diff="hard">狂热<span>HARD</span></button>
+    </div>
+    <button id="startBtn" class="big-btn">▶ 开始游戏</button>
+    <div class="help">
+      <p><b>← / A / F</b> 跳劈，击打<b>空中</b>的敌人　·　<b>→ / D / J</b> 下斩，击打<b>地面</b>的敌人</p>
+      <p><b>ESC / P</b> 暂停　·　星星糖果自动收集　·　连击越高得分越高，攒满热情槽触发 <b>FEVER</b>！</p>
+    </div>
+    <div id="bestLine" class="best-line"></div>
+  </div>
+
+  <!-- 暂停界面 -->
+  <div id="pauseScreen" class="screen hidden">
+    <h2 class="panel-title">⏸ 暂停中</h2>
+    <button id="resumeBtn" class="big-btn">继续游戏</button>
+    <button id="restartBtn" class="mid-btn">重新开始</button>
+    <button id="quitBtn" class="mid-btn dim">回到标题</button>
+  </div>
+
+  <!-- 结算界面 -->
+  <div id="resultScreen" class="screen hidden">
+    <h2 id="resultTitle" class="panel-title">CLEAR!</h2>
+    <div id="rankBadge" class="rank">S</div>
+    <div id="finalScore" class="final-score">0</div>
+    <div id="newRecord" class="new-record hidden">✨ 新纪录！✨</div>
+    <div class="stats">
+      <div><i class="dot d-p"></i>PERFECT<b id="stP">0</b></div>
+      <div><i class="dot d-g"></i>GREAT<b id="stG">0</b></div>
+      <div><i class="dot d-o"></i>GOOD<b id="stO">0</b></div>
+      <div><i class="dot d-m"></i>MISS<b id="stM">0</b></div>
+      <div>最大连击<b id="stC">0</b></div>
+      <div>准确率<b id="stA">0%</b></div>
+    </div>
+    <button id="retryBtn" class="big-btn">再来一次 (R)</button>
+    <button id="menuBtn" class="mid-btn dim">回到标题</button>
+  </div>
+</div>
+
+<script src="js/chart.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
