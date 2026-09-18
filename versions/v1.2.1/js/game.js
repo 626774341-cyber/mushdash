@@ -101,21 +101,12 @@
   const getBest = (songId, diff) => loadJSON(bestKey(songId, diff), null);
 
   // ---------- 版本记录 ----------
-  const GAME_VERSION = '1.3.0';
+  const GAME_VERSION = '1.2.1';
   const REPO = 'https://github.com/626774341-cyber/mushdash';
   const VERSIONS = [
     {
-      v: '1.3.0', date: '2026-09-18', name: '雾蓝夜话',
-      link: './', commit: REPO + '/commit/6fc4d2f',
-      notes: [
-        '新曲目「雾蓝 Swag」——SWAG 系列美学致敬：极简黑封面语言、雾蓝私密度假夜',
-        'R&B 编曲引擎：808 长低音、摇摆 hi-hat、切分底鼓、激光合成器扫频',
-        '92BPM 慢热谱面：敌人稀疏但节拍刁钻，「慢歌高精度」全新挑战维度',
-      ],
-    },
-    {
       v: '1.2.1', date: '2026-09-18', name: '时光机',
-      link: 'versions/v1.2.1/', commit: REPO + '/commit/6fc4d2f',
+      link: './', commit: REPO + '/commit/c41877a',
       notes: [
         '版本记录升级：每个版本都可以点击「玩这个版本」，回到当年的游戏',
         '历史版本源码归档进仓库（versions/ 目录），附 GitHub 源码快照链接',

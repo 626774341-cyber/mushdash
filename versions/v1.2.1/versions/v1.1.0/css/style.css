@@ -61,63 +61,6 @@ canvas { width: 100%; height: 100%; display: block; border-radius: 14px; box-sha
 .help { margin-top: 8px; font-size: 15px; line-height: 2; color: #e8d9ff; }
 .help b { color: #ffd23e; }
 
-/* ---------- 版本记录 ---------- */
-.version-btn {
-  margin-top: -4px;
-  padding: 7px 22px; font-size: 13px; font-weight: 700; letter-spacing: 1px;
-  color: #c9b8e8; font-family: inherit;
-  background: rgba(255,255,255,.08);
-  border: 2px solid rgba(255,255,255,.25); border-radius: 999px;
-  cursor: pointer; transition: all .15s;
-}
-.version-btn:hover { color: #fff; background: rgba(255,255,255,.18); transform: translateY(-1px); }
-
-.version-list {
-  width: min(760px, 90%); max-height: 62vh; overflow-y: auto;
-  display: flex; flex-direction: column; gap: 14px;
-  padding: 6px 10px; text-align: left;
-}
-.ver-card {
-  background: rgba(0,0,0,.25);
-  border: 2px solid rgba(255,255,255,.18);
-  border-radius: 16px; padding: 14px 20px;
-}
-.ver-card.latest { border-color: rgba(126,231,135,.55); }
-.ver-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.ver-badge {
-  font-size: 15px; font-weight: 900; color: #1c1028;
-  background: linear-gradient(160deg, #ffd23e, #ff9a1f);
-  padding: 2px 12px; border-radius: 999px;
-}
-.ver-card.latest .ver-badge { background: linear-gradient(160deg, #7ee787, #3ecf5a); }
-.ver-date { font-size: 12px; color: #a08cc8; font-variant-numeric: tabular-nums; }
-.ver-name { font-size: 17px; font-weight: 900; color: #fff; letter-spacing: 1px; }
-.ver-notes { margin: 9px 0 0; padding-left: 0; list-style: none; }
-.ver-notes li {
-  font-size: 13.5px; color: #e8d9ff; line-height: 1.85;
-  padding-left: 18px; position: relative;
-}
-.ver-notes li::before { content: "▸"; position: absolute; left: 2px; color: #ffd23e; }
-
-.ver-links { display: flex; gap: 10px; margin-top: 11px; }
-.ver-play, .ver-src {
-  font-size: 12.5px; font-weight: 800; text-decoration: none;
-  padding: 5px 16px; border-radius: 999px;
-  transition: all .15s;
-}
-.ver-play {
-  color: #1c1028;
-  background: linear-gradient(160deg, #7ee787, #3ecf5a);
-  box-shadow: 0 3px 0 rgba(0,0,0,.25);
-}
-.ver-play:hover { transform: translateY(-2px); filter: brightness(1.08); }
-.ver-src {
-  color: #c9b8e8;
-  border: 2px solid rgba(255,255,255,.25);
-  background: rgba(255,255,255,.07);
-}
-.ver-src:hover { color: #fff; background: rgba(255,255,255,.16); }
-
 /* ---------- 通用按钮 ---------- */
 .big-btn {
   padding: 14px 52px; font-size: 25px; font-weight: 900; letter-spacing: 4px;
@@ -170,11 +113,11 @@ canvas { width: 100%; height: 100%; display: block; border-radius: 14px; box-sha
   padding-bottom: 14px; text-align: left;
 }
 
-.song-col { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.song-col { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
 
 .song-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 10px 16px; border-radius: 16px;
+  display: flex; align-items: center; gap: 16px;
+  padding: 13px 18px; border-radius: 18px;
   background: rgba(255,255,255,.09);
   border: 3px solid rgba(255,255,255,.28);
   cursor: pointer; transition: all .15s;

@@ -129,11 +129,6 @@ const AudioSys = (() => {
     for (const f of fs) for (const det of [-9, 0, 9])
       tone({ t, f0: f * Math.pow(2, det / 1200), dur: 0.15, type: 'sawtooth', vol: 0.028, lp: 3200 });
   };
-  // 808 长低音：kick 与 sub 融合，R&B 的松弛心跳
-  const kick808 = (t, v = 1) => tone({ t, f0: 130, f1: 36, dur: 0.55, type: 'sine', vol: 0.62 * v });
-  const sub808 = (t, f, v = 1) => tone({ t, f0: f, dur: 0.6, type: 'sine', vol: 0.28 * v, attack: 0.01 });
-  // 激光合成器扫频（SWAG 系列评论提到的 laser-style synths）
-  const laser = (t, v = 1) => tone({ t, f0: 300, f1: 1900, dur: 0.5, type: 'sawtooth', vol: 0.032 * v, lp: 2600 });
   const lead = (t, f, dur, wave, v = 1) => {
     const main = wave === 'sawtooth' ? 0.085 : 0.105;
     const o = ctx.createOscillator(), g = ctx.createGain();
@@ -154,42 +149,6 @@ const AudioSys = (() => {
     const bar = idx >> 4, st = idx & 15;
     const sec = Chart.sectionAt(bar);
     const chord = cur.music.chords[bar % 4];
-    const rnb = cur.style === 'rnb';
-
-    if (rnb) {
-      // ---- 慢热 R&B：切分 808、摇摆 hi-hat、激光扫频 ----
-      let tt = t;
-      if (st % 2 === 1) tt += STEP * 0.34;          // 16 分摇摆位移
-      const swingHat = st === 3 || st === 11;       // 末位 16 分点缀
-      if (sec === 'intro') {
-        if (st === 0) kick808(tt, 0.7);
-        if (st === 4 || st === 12) hat(tt, false, 0.5);
-      } else if (sec === 'outro') {
-        if (st === 0 || st === 8) kick808(tt, 0.6);
-        if (st === 4 || st === 12) hat(tt, false, 0.4);
-        if (st === 0) sub808(tt, F(chord.r));
-      } else {
-        const kicks = (sec === 'chorus') ? [0, 7, 8, 10] : [0, 7, 8];
-        if (kicks.includes(st)) kick808(tt);
-        if (st === 4 || st === 12) snare(tt, 0.9);  // 宽松 backbeat
-        if (st % 2 === 0) hat(tt, false, 0.55);
-        if (swingHat) hat(tt, false, 0.4);
-        if (st === 0 || st === 8) sub808(tt, F(chord.r));
-        if (st === 7) sub808(tt, F(chord.r + 7), 0.7);   // 五度滑入
-        if (sec === 'chorus' && bar % 4 === 3 && st === 12) laser(tt);
-      }
-      if (st === 0) pad(t, chord.pad, STEP * 16 * 0.95);
-
-      const seqBank = cur.music.lead;
-      let seq, li;
-      if (sec === 'intro')       { seq = seqBank.intro;  li = bar; }
-      else if (sec === 'verse')  { seq = seqBank.verse;  li = (bar - 4)  % 4; }
-      else if (sec === 'chorus') { seq = seqBank.chorus; li = (bar < 36 ? bar - 20 : bar - 36) % 4; }
-      else                       { seq = seqBank.outro;  li = (bar - 44) % seqBank.outro.length; }
-      const note = seq[li % seq.length][st];
-      if (note) lead(tt, F(note), sec === 'chorus' ? 0.3 : 0.42, cur.music.wave);
-      return;
-    }
 
     if (sec === 'intro') {
       if (st % 4 === 0) kick(t, 0.8);

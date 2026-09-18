@@ -47,7 +47,6 @@
   const screens = {
     title: $('titleScreen'), lobby: $('lobbyScreen'),
     pause: $('pauseScreen'), result: $('resultScreen'),
-    versions: $('versionsScreen'),
   };
 
   // 页面错误收集，便于自动化测试
@@ -99,79 +98,6 @@
   const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
   const bestKey = (songId, diff) => `mushdash_best_${songId}_${diff}`;
   const getBest = (songId, diff) => loadJSON(bestKey(songId, diff), null);
-
-  // ---------- 版本记录 ----------
-  const GAME_VERSION = '1.3.0';
-  const REPO = 'https://github.com/626774341-cyber/mushdash';
-  const VERSIONS = [
-    {
-      v: '1.3.0', date: '2026-09-18', name: '雾蓝夜话',
-      link: './', commit: REPO + '/commit/6fc4d2f',
-      notes: [
-        '新曲目「雾蓝 Swag」——SWAG 系列美学致敬：极简黑封面语言、雾蓝私密度假夜',
-        'R&B 编曲引擎：808 长低音、摇摆 hi-hat、切分底鼓、激光合成器扫频',
-        '92BPM 慢热谱面：敌人稀疏但节拍刁钻，「慢歌高精度」全新挑战维度',
-      ],
-    },
-    {
-      v: '1.2.1', date: '2026-09-18', name: '时光机',
-      link: 'versions/v1.2.1/', commit: REPO + '/commit/6fc4d2f',
-      notes: [
-        '版本记录升级：每个版本都可以点击「玩这个版本」，回到当年的游戏',
-        '历史版本源码归档进仓库（versions/ 目录），附 GitHub 源码快照链接',
-      ],
-    },
-    {
-      v: '1.2.0', date: '2026-09-18', name: '酸性绿入侵',
-      link: 'versions/v1.2.0/', commit: REPO + '/commit/e2cb092',
-      notes: [
-        '编曲全面电子化：四踩底鼓、侧链泵感、酸性贝斯、失谐和声与主旋律回声',
-        '新曲目「酸柠狂潮 Acid Lime」——酸性绿舞池主题，148BPM 洗脑 riff',
-        '游戏内版本记录功能上线',
-      ],
-    },
-    {
-      v: '1.1.0', date: '2026-09-18', name: '演出大厅',
-      link: 'versions/v1.1.0/', commit: REPO + '/commit/a1106b4',
-      notes: [
-        '新流程：选曲 × 角色 × 难度的大厅',
-        '新角色 蓝莓（Fever 加成）与 岩岩（高血量减伤）',
-        '判定偏移校准、每曲目×难度成绩存档、FULL COMBO 结算徽章',
-        '曲目主题化场景（草原 / 黄昏 / 星夜）',
-      ],
-    },
-    {
-      v: '1.0.0', date: '2026-09-18', name: '蘑菇冲刺',
-      link: 'versions/v1.0.0/', commit: REPO + '/commit/dc24396',
-      notes: [
-        '核心玩法：跳劈 / 下斩双轨道节奏跑酷',
-        'PERFECT / GREAT / GOOD 三档判定，连击加成与 FEVER 系统',
-        '曲目「霓虹疾走」，连打链与糖果收集',
-      ],
-    },
-  ];
-  function buildVersions() {
-    const list = $('versionList');
-    list.innerHTML = '';
-    for (const ver of VERSIONS) {
-      const card = document.createElement('div');
-      card.className = 'ver-card' + (ver.v === GAME_VERSION ? ' latest' : '');
-      const isCurrent = ver.v === GAME_VERSION;
-      card.innerHTML = `
-        <div class="ver-head">
-          <span class="ver-badge">v${ver.v}</span>
-          ${isCurrent ? '<span class="ver-date">当前版本</span>' : ''}
-          <span class="ver-date">${ver.date}</span>
-          <span class="ver-name">${ver.name}</span>
-        </div>
-        <ul class="ver-notes">${ver.notes.map(n => `<li>${n}</li>`).join('')}</ul>
-        <div class="ver-links">
-          <a class="ver-play" href="${ver.link}" target="_blank" rel="noopener">${isCurrent ? '▶ 玩当前版本' : '▶ 玩这个版本'}</a>
-          <a class="ver-src" href="${ver.commit}" target="_blank" rel="noopener">源码快照 ↗</a>
-        </div>`;
-      list.appendChild(card);
-    }
-  }
 
   // ---------- 选择状态 ----------
   let songId = 'neon';
@@ -936,7 +862,6 @@
     if (e.repeat) return;
     const k = e.code;
     if (k === 'Escape' || k === 'KeyP') {
-      if (state === 'versions') { showScreen('title'); return; }
       if (state === 'lobby') { showScreen('title'); return; }
       setPause(state === 'playing');
       return;
@@ -968,13 +893,10 @@
 
   // ---------- 界面导航 ----------
   function showScreen(name) {
-    if (name === 'title') state = 'title';
-    else if (name === 'lobby') state = 'lobby';
-    else if (name === 'versions') state = 'versions';
+    state = name === 'title' ? 'title' : name === 'lobby' ? 'lobby' : state;
     for (const k in screens) screens[k].classList.add('hidden');
     if (name === 'title') screens.title.classList.remove('hidden');
     if (name === 'lobby') { buildLobby(); screens.lobby.classList.remove('hidden'); }
-    if (name === 'versions') { buildVersions(); screens.versions.classList.remove('hidden'); }
   }
   function enterLobby() {
     AudioSys.ensure(); AudioSys.sfxUI();
@@ -982,9 +904,6 @@
   }
 
   $('startBtn').addEventListener('click', enterLobby);
-  $('versionBtn').textContent = `v${GAME_VERSION} · 更新记录`;
-  $('versionBtn').addEventListener('click', () => { AudioSys.ensure(); AudioSys.sfxUI(); showScreen('versions'); });
-  $('versionsCloseBtn').addEventListener('click', () => { AudioSys.sfxUI(); showScreen('title'); });
   $('backBtn').addEventListener('click', () => { AudioSys.sfxUI(); showScreen('title'); });
   $('playBtn').addEventListener('click', () => { startGame(); $('playBtn').blur(); });
   document.querySelectorAll('#diffRow .diff-btn').forEach(b => {
