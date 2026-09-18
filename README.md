@@ -67,6 +67,20 @@
 - 或起本地服务器：`python3 -m http.server 8765` 后访问
   <http://127.0.0.1:8765/>。
 
+## 版本记录与直达链接
+
+每个版本都以独立快照归档，可随时打开回到当年的样子；改动明细见 [CHANGELOG.md](CHANGELOG.md)，
+游戏内标题界面点「版本号 · 更新记录」也能查看。
+
+| 版本 | 直达链接 | 主要更新 |
+|---|---|---|
+| **v2.0.0 · 3D 版**（最新） | [立即游玩](https://626774341-cyber.github.io/mushdash/) · [首发快照](https://626774341-cyber.github.io/mushdash/versions/v2.0/) | 竖屏 3D 重制、左右车道（A/D）、长按怪菇霸、糖果互动收集、FEVER 舞台化（荧光棒海/灯牌/彩虹/探照灯/霓虹灯框）、张力特效包 |
+| v1.3.0 · 雾蓝夜话 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.2.1/) | 新曲目雾蓝 Swag、R&B 编曲引擎、慢热高精度谱面 |
+| v1.2.1 · 时光机 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.2.0/) | 版本记录支持一键游玩历史版本 |
+| v1.2.0 · 酸柠狂潮 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.2.0/) | 电子舞曲编曲、新曲目酸柠狂潮、游戏内版本记录 |
+| v1.1.0 · 演出大厅 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.1.0/) | 大厅流程、三角色三难度、判定偏移校准、成绩存档 |
+| v1.0.0 · 蘑菇冲刺 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.0.0/) | 初版：双轨道节奏跑酷、chiptune 程序化音乐 |
+
 ## 代码结构
 
 ```
