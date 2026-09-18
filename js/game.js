@@ -948,6 +948,44 @@
           }});
         }
       }
+      // 应援灯牌：GO! / ♪ / ★ 轮流闪烁
+      const icons = ['GO!', '♪', '★'];
+      for (let side = -1; side <= 1; side += 2) {
+        for (let i = 0; i < 4; i++) {
+          const z = 40 - ((flow + i * 9 + (side > 0 ? 4.5 : 0)) % 40);
+          const sx = side * 4.9;
+          const rise = riseOf(i * 0.3 + (side > 0 ? 0.25 : 0));
+          if (rise <= 0.02) continue;
+          const base = project(sx, 0, z);
+          if (!base || base.zc > DRAW_FAR) continue;
+          const poleTop = project(sx, 1.5 * rise, z);
+          if (!poleTop) continue;
+          const icon = icons[(i + Math.floor(t * 1.5)) % 3];
+          const blink = Math.floor(t * 3) % 2 === 0;
+          const col = stickCols[(i + 1) % stickCols.length];
+          const fog = fogAlpha(base.zc);
+          const tilt = Math.sin(now * 6.5 - z * 0.55) * 0.1;
+          items.push({ zc: base.zc, draw() {
+            ctx.save();
+            ctx.globalAlpha = fog * rise;
+            ctx.strokeStyle = '#f6ead2'; ctx.lineWidth = 0.14 * base.s; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(poleTop.x, poleTop.y); ctx.stroke();
+            ctx.translate(poleTop.x, poleTop.y);
+            ctx.rotate(tilt * side);
+            const bw = 1.5 * base.s * rise, bh = 0.95 * base.s * rise;
+            ctx.fillStyle = '#fff';
+            rrect(ctx, -bw / 2, -bh, bw, bh, 0.12 * base.s * rise); ctx.fill();
+            ctx.strokeStyle = col; ctx.lineWidth = 0.09 * base.s * rise; ctx.stroke();
+            if (blink) {
+              ctx.fillStyle = col;
+              ctx.font = `900 ${Math.max(6, 0.52 * base.s * rise)}px "PingFang SC","Microsoft YaHei",sans-serif`;
+              ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+              ctx.fillText(icon, 0, -bh / 2);
+            }
+            ctx.restore();
+          }});
+        }
+      }
     }
 
       // 蘑菇观众：细杆大蘑菇大幅左右摇摆，举着荧光棒随人浪打 call
