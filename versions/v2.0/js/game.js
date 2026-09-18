@@ -133,7 +133,7 @@
         '双轨道改为左右车道：A/← 斩左道紫怒菌、D/→ 斩右道黄飞菇，触屏左右半屏对应',
         '全新长按怪「菇霸」：戴金冠的大蘑菇王，按住把它压扁撑到倒计时结束拿高分；提前松手会被反击',
         '星星糖果改为按对应车道互动收集；旧连打链移除',
-        'FEVER 全面舞台化：荧光棒海与 GO!/♪/★ 应援灯牌、七彩虹、探照灯与跑马灯、全屏霓虹灯框、彩纸雨',
+        'FEVER 全面舞台化：荧光棒海、七彩虹、探照灯与跑马灯、全屏霓虹灯框、彩纸雨',
         '表现张力包：击杀镜头冲镜、节拍脉冲、PERFECT 白闪、人浪应援、每 25 连击爆闪、通关烟花、夜晚流星',
         '玩法判定、音乐、成绩存档与 1.x 完全兼容',
       ],
@@ -911,7 +911,7 @@
       return 1 + pb * pb * ((2.8 + 1) * pb + 2.8);   // easeOutBack 弹出
     };
 
-    // FEVER 应援区：路边升起荧光棒海 + 应援灯牌，随人浪起伏打 call
+    // FEVER 应援区：路边升起荧光棒海，随人浪起伏打 call
     // FEVER 应援物配色
     const stickCols = ['#ff5f9e', '#4de1ff', '#ffd23e', '#a6ff5f', '#c49bff'];
     if (feverMix > 0) {
@@ -944,44 +944,6 @@
             ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(tip.x, tip.y); ctx.stroke();
             ctx.fillStyle = '#ffffff';
             ctx.beginPath(); ctx.arc(tip.x, tip.y, 0.075 * base.s, 0, TAU); ctx.fill();
-            ctx.restore();
-          }});
-        }
-      }
-      // 应援灯牌：GO! / ♪ / ★ 轮流闪烁
-      const icons = ['GO!', '♪', '★'];
-      for (let side = -1; side <= 1; side += 2) {
-        for (let i = 0; i < 4; i++) {
-          const z = 40 - ((flow + i * 9 + (side > 0 ? 4.5 : 0)) % 40);
-          const sx = side * 4.9;
-          const rise = riseOf(i * 0.3 + (side > 0 ? 0.25 : 0));
-          if (rise <= 0.02) continue;
-          const base = project(sx, 0, z);
-          if (!base || base.zc > DRAW_FAR) continue;
-          const poleTop = project(sx, 1.5 * rise, z);
-          if (!poleTop) continue;
-          const icon = icons[(i + Math.floor(t * 1.5)) % 3];
-          const blink = Math.floor(t * 3) % 2 === 0;
-          const col = stickCols[(i + 1) % stickCols.length];
-          const fog = fogAlpha(base.zc);
-          const tilt = Math.sin(now * 6.5 - z * 0.55) * 0.1;
-          items.push({ zc: base.zc, draw() {
-            ctx.save();
-            ctx.globalAlpha = fog * rise;
-            ctx.strokeStyle = '#f6ead2'; ctx.lineWidth = 0.14 * base.s; ctx.lineCap = 'round';
-            ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(poleTop.x, poleTop.y); ctx.stroke();
-            ctx.translate(poleTop.x, poleTop.y);
-            ctx.rotate(tilt * side);
-            const bw = 1.5 * base.s * rise, bh = 0.95 * base.s * rise;
-            ctx.fillStyle = '#fff';
-            rrect(ctx, -bw / 2, -bh, bw, bh, 0.12 * base.s * rise); ctx.fill();
-            ctx.strokeStyle = col; ctx.lineWidth = 0.09 * base.s * rise; ctx.stroke();
-            if (blink) {
-              ctx.fillStyle = col;
-              ctx.font = `900 ${Math.max(6, 0.52 * base.s * rise)}px "PingFang SC","Microsoft YaHei",sans-serif`;
-              ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-              ctx.fillText(icon, 0, -bh / 2);
-            }
             ctx.restore();
           }});
         }

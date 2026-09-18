@@ -74,7 +74,7 @@
 
 | 版本 | 直达链接 | 主要更新 |
 |---|---|---|
-| **v2.0.0 · 3D 版**（最新） | [立即游玩](https://626774341-cyber.github.io/mushdash/) · [首发快照](https://626774341-cyber.github.io/mushdash/versions/v2.0/) | 竖屏 3D 重制、左右车道（A/D）、长按怪菇霸、糖果互动收集、FEVER 舞台化（荧光棒海/灯牌/彩虹/探照灯/霓虹灯框）、张力特效包 |
+| **v2.0.0 · 3D 版**（最新） | [立即游玩](https://626774341-cyber.github.io/mushdash/) · [首发快照](https://626774341-cyber.github.io/mushdash/versions/v2.0/) | 竖屏 3D 重制、左右车道（A/D）、长按怪菇霸、糖果互动收集、FEVER 舞台化（荧光棒海/彩虹/探照灯/霓虹灯框）、张力特效包 |
 | v1.3.0 · 雾蓝夜话 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.2.1/) | 新曲目雾蓝 Swag、R&B 编曲引擎、慢热高精度谱面 |
 | v1.2.1 · 时光机 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.2.0/) | 版本记录支持一键游玩历史版本 |
 | v1.2.0 · 酸柠狂潮 | [立即游玩](https://626774341-cyber.github.io/mushdash/versions/v1.2.0/) | 电子舞曲编曲、新曲目酸柠狂潮、游戏内版本记录 |
