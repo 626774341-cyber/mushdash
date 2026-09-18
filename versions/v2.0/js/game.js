@@ -987,15 +987,11 @@
               ctx.save();
               ctx.translate(s * 11, -42);
               ctx.rotate(s * (0.4 + wave2 * 0.3));
-              ctx.save();
-              ctx.globalCompositeOperation = 'lighter';
-              ctx.strokeStyle = stickCol; ctx.globalAlpha = 0.4; ctx.lineWidth = 7;
-              ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -28); ctx.stroke();
-              ctx.globalAlpha = 1; ctx.lineWidth = 3.2;
-              ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -28); ctx.stroke();
-              ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2;
-              ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -28); ctx.stroke();
-              ctx.restore();
+              ctx.lineCap = 'round';
+              ctx.strokeStyle = stickCol; ctx.lineWidth = 5;
+              ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -26); ctx.stroke();
+              ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.6;
+              ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -26); ctx.stroke();
               ctx.restore();
             }
             // 细细的杆
@@ -1022,11 +1018,6 @@
             ctx.beginPath(); ctx.arc(-18, -16, 6.5, 0, TAU); ctx.fill();
             ctx.beginPath(); ctx.arc(11, -24, 5, 0, TAU); ctx.fill();
             ctx.beginPath(); ctx.arc(28, -6, 4.2, 0, TAU); ctx.fill();
-            ctx.globalCompositeOperation = 'lighter';
-            ctx.globalAlpha = fog * 0.5;
-            ctx.strokeStyle = capCol;
-            ctx.lineWidth = 2.2;
-            ctx.beginPath(); ctx.arc(0, 0, 48, Math.PI, 0); ctx.stroke();
             ctx.restore();
             ctx.restore();
           }});
@@ -1097,8 +1088,8 @@
         else if (e.state === 'live') ay += Math.abs(Math.sin(now * 9 + e.id * 1.7)) * 0.22;
 
         if (e.kind === 'hold') {
-          // 菇霸：按住时头部钉在角色前方，其他状态头部随时间推进
-          const anchorZ = e.state === 'holding' ? 0.95 : w.z;
+          // 菇霸：按住时钉在角色前方一段距离，和角色错开不重叠
+          const anchorZ = e.state === 'holding' ? 1.7 : w.z;
           const hp2 = project(w.x, ay, anchorZ);
           if (!hp2 || hp2.zc > DRAW_FAR) continue;
           const alpha = e.state === 'missed' ? Math.max(0, 1 - e.fallT * 1.6) : fogAlpha(hp2.zc);
@@ -1158,7 +1149,7 @@
     return { zc: headP.zc, draw() {
       // 按住时：脚下金色压制光环
       if (holding) {
-        const rp = project(laneX, 0.02, 0.95);
+        const rp = project(laneX, 0.02, 1.7);
         if (rp) {
           const rr = (0.88 + Math.sin(now * 12) * 0.1) * rp.s;
           ctx.save();
@@ -1214,22 +1205,20 @@
         ctx.beginPath(); ctx.ellipse(-30, -52 - sweat * 9, 3.6, 5, -0.5, 0, TAU); ctx.fill();
         ctx.beginPath(); ctx.ellipse(30, -50 - (1 - sweat) * 9, 3.6, 5, 0.5, 0, TAU); ctx.fill();
       }
-      // 大帽（深紫红，平面单色 + 帽檐暗边）
-      ctx.fillStyle = '#c2378f';
+      // 大帽（青蓝，平面单色 + 帽檐暗边）
+      ctx.fillStyle = '#2fb3c9';
       ctx.beginPath();
       ctx.arc(0, -58, 52, Math.PI, 0);
       ctx.quadraticCurveTo(0, -42, -52, -58);
       ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#9b2a72';
+      ctx.fillStyle = '#1b8ba0';
       ctx.beginPath();
       ctx.ellipse(0, -46, 45, 6.5, 0, 0, TAU); ctx.fill();
-      // 斑点（白 + 浅粉）
+      // 白点
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.beginPath(); ctx.arc(-20, -74, 6.5, 0, TAU); ctx.fill();
       ctx.beginPath(); ctx.arc(12, -82, 5.2, 0, TAU); ctx.fill();
       ctx.beginPath(); ctx.arc(30, -64, 4.2, 0, TAU); ctx.fill();
-      ctx.fillStyle = 'rgba(242,184,221,0.9)';
-      ctx.beginPath(); ctx.arc(-4, -70, 3.6, 0, TAU); ctx.fill();
       // 金冠（戴在帽顶，红宝石）
       ctx.save();
       ctx.translate(0, -104);
