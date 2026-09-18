@@ -1177,65 +1177,71 @@
       ctx.translate(jig, 0);
       if (dead) ctx.rotate(roll);
       ctx.scale(stX, sq);
-      // 茎（身体）
+      // 短手臂（平时叉腰，被按住时乱挥）
+      ctx.strokeStyle = '#f2e3cb'; ctx.lineWidth = 11; ctx.lineCap = 'round';
+      if (holding) {
+        const fa = Math.sin(now * 21) * 7;
+        ctx.beginPath(); ctx.moveTo(-22, -36); ctx.lineTo(-34, -48 + fa); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(22, -36); ctx.lineTo(34, -40 - fa); ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.moveTo(-22, -36); ctx.lineTo(-30, -24); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(22, -36); ctx.lineTo(30, -24); ctx.stroke();
+      }
+      // 宽厚身体（顶端 -62 深深伸进帽盖里，绝无接缝）
       ctx.fillStyle = '#f2e3cb';
       ctx.beginPath();
-      ctx.moveTo(-19, 2);
-      ctx.quadraticCurveTo(-24, -30, -17, -50);
-      ctx.lineTo(17, -50);
-      ctx.quadraticCurveTo(24, -30, 19, 2);
+      ctx.moveTo(-24, 2);
+      ctx.quadraticCurveTo(-28, -30, -22, -62);
+      ctx.lineTo(22, -62);
+      ctx.quadraticCurveTo(28, -30, 24, 2);
       ctx.closePath(); ctx.fill();
-      // 脸
-      ctx.strokeStyle = '#4a3320'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-      if (dead) {
-        ctx.beginPath(); ctx.moveTo(-11, -34); ctx.lineTo(-4, -27); ctx.moveTo(-4, -34); ctx.lineTo(-11, -27); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(4, -34); ctx.lineTo(11, -27); ctx.moveTo(11, -34); ctx.lineTo(4, -27); ctx.stroke();
-        ctx.beginPath(); ctx.arc(0, -20, 5, 0, Math.PI); ctx.stroke();
-      } else if (holding) {
-        // 挣扎的 >< 眼 + 咧嘴
-        ctx.beginPath(); ctx.moveTo(-11, -33); ctx.lineTo(-5, -30); ctx.lineTo(-11, -27); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(11, -33); ctx.lineTo(5, -30); ctx.lineTo(11, -27); ctx.stroke();
-        ctx.beginPath(); ctx.arc(0, -19, 4.5, 0.2, Math.PI - 0.2); ctx.stroke();
-        // 汗滴
+      // 怒目脸（粗眉 + 圆眼 + 龇牙）
+      ctx.strokeStyle = '#4a3320'; ctx.lineWidth = 3.4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-15, -42); ctx.lineTo(-5, -37); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(15, -42); ctx.lineTo(5, -37); ctx.stroke();
+      ctx.fillStyle = '#4a3320';
+      ctx.beginPath(); ctx.arc(-9, -32, 3.4, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(9, -32, 3.4, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      rrect(ctx, -10, -26, 20, 7, 2); ctx.fill();
+      ctx.strokeStyle = '#4a3320'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(-4, -26); ctx.lineTo(-4, -19); ctx.moveTo(0, -26); ctx.lineTo(0, -19); ctx.moveTo(4, -26); ctx.lineTo(4, -19); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, -26, 10, Math.PI + 0.25, -0.25); ctx.stroke();
+      // 汗滴（被按住时）
+      if (holding) {
         ctx.fillStyle = 'rgba(140,220,255,0.9)';
         const sweat = Math.abs(Math.sin(now * 13));
-        ctx.beginPath(); ctx.ellipse(-26, -46 - sweat * 8, 3.2, 4.6, -0.5, 0, TAU); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(26, -44 - (1 - sweat) * 8, 3.2, 4.6, 0.5, 0, TAU); ctx.fill();
-      } else {
-        // 生气眉眼 + 撇嘴
-        ctx.beginPath(); ctx.moveTo(-12, -35); ctx.lineTo(-4, -31); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(12, -35); ctx.lineTo(4, -31); ctx.stroke();
-        ctx.fillStyle = '#4a3320';
-        ctx.beginPath(); ctx.arc(-8, -28, 3, 0, TAU); ctx.fill();
-        ctx.beginPath(); ctx.arc(8, -28, 3, 0, TAU); ctx.fill();
-        ctx.beginPath(); ctx.arc(0, -18, 5, Math.PI + 0.3, -0.3); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(-30, -52 - sweat * 9, 3.6, 5, -0.5, 0, TAU); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(30, -50 - (1 - sweat) * 9, 3.6, 5, 0.5, 0, TAU); ctx.fill();
       }
-      // 帽子（青绿大头帽，平面单色 + 帽檐暗边）
-      ctx.fillStyle = '#2fb3c9';
+      // 大帽（深紫红，平面单色 + 帽檐暗边）
+      ctx.fillStyle = '#c2378f';
       ctx.beginPath();
-      ctx.arc(0, -52, 41, Math.PI, 0);
-      ctx.quadraticCurveTo(0, -38, -41, -52);
+      ctx.arc(0, -58, 52, Math.PI, 0);
+      ctx.quadraticCurveTo(0, -42, -52, -58);
       ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#1b8ba0';
+      ctx.fillStyle = '#9b2a72';
       ctx.beginPath();
-      ctx.ellipse(0, -40, 36, 5.5, 0, 0, TAU); ctx.fill();
-      // 白点
+      ctx.ellipse(0, -46, 45, 6.5, 0, 0, TAU); ctx.fill();
+      // 斑点（白 + 浅粉）
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.beginPath(); ctx.arc(-18, -66, 5.5, 0, TAU); ctx.fill();
-      ctx.beginPath(); ctx.arc(8, -74, 4.5, 0, TAU); ctx.fill();
-      ctx.beginPath(); ctx.arc(24, -58, 3.6, 0, TAU); ctx.fill();
-      // 金冠
+      ctx.beginPath(); ctx.arc(-20, -74, 6.5, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(12, -82, 5.2, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(30, -64, 4.2, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(242,184,221,0.9)';
+      ctx.beginPath(); ctx.arc(-4, -70, 3.6, 0, TAU); ctx.fill();
+      // 金冠（戴在帽顶，红宝石）
       ctx.save();
-      ctx.translate(0, -92);
+      ctx.translate(0, -104);
       ctx.fillStyle = '#ffd23e';
-      ctx.strokeStyle = '#e8a01f'; ctx.lineWidth = 1.5;
+      ctx.strokeStyle = '#e8a01f'; ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(-14, 6);
-      ctx.lineTo(-16, -8); ctx.lineTo(-8, -2); ctx.lineTo(0, -12);
-      ctx.lineTo(8, -2); ctx.lineTo(16, -8); ctx.lineTo(14, 6);
+      ctx.moveTo(-20, 8);
+      ctx.lineTo(-23, -10); ctx.lineTo(-11, -3); ctx.lineTo(0, -15);
+      ctx.lineTo(11, -3); ctx.lineTo(23, -10); ctx.lineTo(20, 8);
       ctx.closePath(); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#ff5f6d';
-      ctx.beginPath(); ctx.arc(0, -2, 2.4, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, 3, 0, TAU); ctx.fill();
       ctx.restore();
       ctx.restore();
     }};
