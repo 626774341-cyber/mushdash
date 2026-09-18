@@ -47,6 +47,7 @@
   const screens = {
     title: $('titleScreen'), lobby: $('lobbyScreen'),
     pause: $('pauseScreen'), result: $('resultScreen'),
+    versions: $('versionsScreen'),
   };
 
   // 页面错误收集，便于自动化测试
@@ -98,6 +99,53 @@
   const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
   const bestKey = (songId, diff) => `mushdash_best_${songId}_${diff}`;
   const getBest = (songId, diff) => loadJSON(bestKey(songId, diff), null);
+
+  // ---------- 版本记录 ----------
+  const GAME_VERSION = '1.2.0';
+  const VERSIONS = [
+    {
+      v: '1.2.0', date: '2026-09-18', name: '酸性绿入侵',
+      notes: [
+        '编曲全面电子化：四踩底鼓、侧链泵感、酸性贝斯、失谐和声与主旋律回声',
+        '新曲目「酸柠狂潮 Acid Lime」——酸性绿舞池主题，148BPM 洗脑 riff',
+        '游戏内版本记录功能上线',
+      ],
+    },
+    {
+      v: '1.1.0', date: '2026-09-18', name: '演出大厅',
+      notes: [
+        '新流程：选曲 × 角色 × 难度的大厅',
+        '新角色 蓝莓（Fever 加成）与 岩岩（高血量减伤）',
+        '判定偏移校准、每曲目×难度成绩存档、FULL COMBO 结算徽章',
+        '曲目主题化场景（草原 / 黄昏 / 星夜）',
+      ],
+    },
+    {
+      v: '1.0.0', date: '2026-09-18', name: '蘑菇冲刺',
+      notes: [
+        '核心玩法：跳劈 / 下斩双轨道节奏跑酷',
+        'PERFECT / GREAT / GOOD 三档判定，连击加成与 FEVER 系统',
+        '曲目「霓虹疾走」，连打链与糖果收集',
+      ],
+    },
+  ];
+  function buildVersions() {
+    const list = $('versionList');
+    list.innerHTML = '';
+    for (const ver of VERSIONS) {
+      const card = document.createElement('div');
+      card.className = 'ver-card' + (ver.v === GAME_VERSION ? ' latest' : '');
+      card.innerHTML = `
+        <div class="ver-head">
+          <span class="ver-badge">v${ver.v}</span>
+          ${ver.v === GAME_VERSION ? '<span class="ver-date">当前版本</span>' : ''}
+          <span class="ver-date">${ver.date}</span>
+          <span class="ver-name">${ver.name}</span>
+        </div>
+        <ul class="ver-notes">${ver.notes.map(n => `<li>${n}</li>`).join('')}</ul>`;
+      list.appendChild(card);
+    }
+  }
 
   // ---------- 选择状态 ----------
   let songId = 'neon';
@@ -862,6 +910,7 @@
     if (e.repeat) return;
     const k = e.code;
     if (k === 'Escape' || k === 'KeyP') {
+      if (state === 'versions') { showScreen('title'); return; }
       if (state === 'lobby') { showScreen('title'); return; }
       setPause(state === 'playing');
       return;
@@ -893,10 +942,13 @@
 
   // ---------- 界面导航 ----------
   function showScreen(name) {
-    state = name === 'title' ? 'title' : name === 'lobby' ? 'lobby' : state;
+    if (name === 'title') state = 'title';
+    else if (name === 'lobby') state = 'lobby';
+    else if (name === 'versions') state = 'versions';
     for (const k in screens) screens[k].classList.add('hidden');
     if (name === 'title') screens.title.classList.remove('hidden');
     if (name === 'lobby') { buildLobby(); screens.lobby.classList.remove('hidden'); }
+    if (name === 'versions') { buildVersions(); screens.versions.classList.remove('hidden'); }
   }
   function enterLobby() {
     AudioSys.ensure(); AudioSys.sfxUI();
@@ -904,6 +956,9 @@
   }
 
   $('startBtn').addEventListener('click', enterLobby);
+  $('versionBtn').textContent = `v${GAME_VERSION} · 更新记录`;
+  $('versionBtn').addEventListener('click', () => { AudioSys.ensure(); AudioSys.sfxUI(); showScreen('versions'); });
+  $('versionsCloseBtn').addEventListener('click', () => { AudioSys.sfxUI(); showScreen('title'); });
   $('backBtn').addEventListener('click', () => { AudioSys.sfxUI(); showScreen('title'); });
   $('playBtn').addEventListener('click', () => { startGame(); $('playBtn').blur(); });
   document.querySelectorAll('#diffRow .diff-btn').forEach(b => {
