@@ -17,17 +17,42 @@
       <h1>Mush<span>Dash</span></h1>
       <p class="subtitle">🍄 蘑菇冲刺 · 节奏跑酷 🎵</p>
     </div>
-    <div class="diff-picker">
-      <button class="diff-btn" data-diff="easy">轻松<span>EASY</span></button>
-      <button class="diff-btn selected" data-diff="normal">普通<span>NORMAL</span></button>
-      <button class="diff-btn" data-diff="hard">狂热<span>HARD</span></button>
-    </div>
-    <button id="startBtn" class="big-btn">▶ 开始游戏</button>
+    <button id="startBtn" class="big-btn">▶ 进入大厅</button>
     <div class="help">
       <p><b>← / A / F</b> 跳劈，击打<b>空中</b>的敌人　·　<b>→ / D / J</b> 下斩，击打<b>地面</b>的敌人</p>
-      <p><b>ESC / P</b> 暂停　·　星星糖果自动收集　·　连击越高得分越高，攒满热情槽触发 <b>FEVER</b>！</p>
+      <p><b>ESC / P</b> 暂停　·　糖果自动收集　·　连击越高分越高，攒满热情槽触发 <b>FEVER</b>！</p>
     </div>
-    <div id="bestLine" class="best-line"></div>
+  </div>
+
+  <!-- 大厅：选曲 / 角色 / 难度 -->
+  <div id="lobbyScreen" class="screen hidden">
+    <div class="lobby-head">
+      <button id="backBtn" class="round-btn" title="返回标题">←</button>
+      <h2 class="panel-title small">选择你的演出</h2>
+      <div class="head-spacer"></div>
+    </div>
+    <div class="lobby-grid">
+      <div class="song-col" id="songList"></div>
+      <div class="setup-col">
+        <div class="sec-label">演出者</div>
+        <div class="char-row" id="charRow"></div>
+        <div class="sec-label">难度</div>
+        <div class="diff-picker" id="diffRow">
+          <button class="diff-btn" data-diff="easy">轻松<span>EASY</span></button>
+          <button class="diff-btn selected" data-diff="normal">普通<span>NORMAL</span></button>
+          <button class="diff-btn" data-diff="hard">狂热<span>HARD</span></button>
+        </div>
+        <div class="offset-line">
+          <span class="sec-label inline">判定偏移</span>
+          <button id="offsetMinus" class="tiny-btn">−</button>
+          <b id="offsetVal">0ms</b>
+          <button id="offsetPlus" class="tiny-btn">＋</button>
+          <span class="offset-hint">判定总偏早/偏晚时用来校准</span>
+        </div>
+        <div id="records" class="records"></div>
+        <button id="playBtn" class="big-btn">▶ 开始！</button>
+      </div>
+    </div>
   </div>
 
   <!-- 暂停界面 -->
@@ -35,15 +60,21 @@
     <h2 class="panel-title">⏸ 暂停中</h2>
     <button id="resumeBtn" class="big-btn">继续游戏</button>
     <button id="restartBtn" class="mid-btn">重新开始</button>
-    <button id="quitBtn" class="mid-btn dim">回到标题</button>
+    <button id="quitBtn" class="mid-btn dim">回到大厅</button>
   </div>
 
   <!-- 结算界面 -->
   <div id="resultScreen" class="screen hidden">
     <h2 id="resultTitle" class="panel-title">CLEAR!</h2>
-    <div id="rankBadge" class="rank">S</div>
-    <div id="finalScore" class="final-score">0</div>
-    <div id="newRecord" class="new-record hidden">✨ 新纪录！✨</div>
+    <div id="resultMeta" class="result-meta"></div>
+    <div class="result-rank-row">
+      <div id="rankBadge" class="rank">S</div>
+      <div class="result-score-col">
+        <div id="fcBadge" class="fc-badge hidden">✦ FULL COMBO ✦</div>
+        <div id="finalScore" class="final-score">0</div>
+        <div id="newRecord" class="new-record hidden">✨ 新纪录！✨</div>
+      </div>
+    </div>
     <div class="stats">
       <div><i class="dot d-p"></i>PERFECT<b id="stP">0</b></div>
       <div><i class="dot d-g"></i>GREAT<b id="stG">0</b></div>
@@ -52,8 +83,10 @@
       <div>最大连击<b id="stC">0</b></div>
       <div>准确率<b id="stA">0%</b></div>
     </div>
-    <button id="retryBtn" class="big-btn">再来一次 (R)</button>
-    <button id="menuBtn" class="mid-btn dim">回到标题</button>
+    <div class="result-btns">
+      <button id="retryBtn" class="big-btn">再来一次 (R)</button>
+      <button id="menuBtn" class="mid-btn dim">回到大厅</button>
+    </div>
   </div>
 </div>
 

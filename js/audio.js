@@ -4,18 +4,20 @@
  * 以 AudioContext 时钟为准调度 16 分音符，游戏逻辑全部
  * 挂在 songTime() 上，音乐与谱面天然同步；暂停用
  * ctx.suspend()，时钟冻结，恢复零漂移。
+ * 曲目通过 startSong(songDef, totalSteps) 注入：
+ * BPM、和弦进行、旋律素材、主音色都随歌切换。
  * ============================================================ */
 const AudioSys = (() => {
-  const BPM = Chart.BPM;
-  const STEP = 60 / BPM / 4;      // 16 分音符时长
   const F = m => 440 * Math.pow(2, (m - 69) / 12);   // MIDI → 频率
 
   let ctx = null, master, musicGain, sfxGain, noiseBuf;
   let muted = false;
   let songTimer = null, stepIdx = 0, nextStepT = 0, totalSteps = 0;
   let songStartT = 0, playing = false;
+  let cur = null;                                    // 当前歌曲定义
+  let STEP = 60 / 138 / 4;
 
-  // 自动化测试模式（?testclock=1）：用 8 倍速性能时钟驱动游戏时间，
+  // 自动化测试模式（?testclock=1）：用 40 倍速性能时钟驱动游戏时间，
   // BGM 静默跳过，方便脚本快速跑完整局。正常游玩不携带该参数，行为完全不变。
   const TEST_CLOCK = /[?&#]testclock=1/.test(location.href);
   const TEST_SPEED = 40;
@@ -86,44 +88,19 @@ const AudioSys = (() => {
   };
   const hat  = (t, open = false, v = 1) => noise({ t, dur: open ? 0.14 : 0.035, vol: 0.07 * v, hp: 6800 });
   const bass = (t, f, v = 1) => tone({ t, f0: f, dur: 0.17, type: 'square', vol: 0.15 * v, lp: 720 });
-  const lead = (t, f, dur, v = 1) => {
-    tone({ t, f0: f, dur, type: 'square', vol: 0.105 * v, lp: 2600 });
+  const lead = (t, f, dur, wave, v = 1) => {
+    const main = wave === 'sawtooth' ? 0.085 : 0.105;
+    tone({ t, f0: f, dur, type: wave, vol: main * v, lp: 2600 });
     tone({ t, f0: f * 2.004, dur: dur * 0.8, type: 'triangle', vol: 0.045 * v });
   };
   const pad = (t, fs, dur) => { for (const f of fs) tone({ t, f0: f, dur, type: 'triangle', vol: 0.042, attack: 0.22 }); };
 
-  /* ---------- 旋律素材（A 小调五声） ---------- */
-  const _ = null;
-  const LEAD = {
-    intro: [[69,_,_,_, 72,_,_,_, 76,_,_,_, 74,_,72,_]],
-    verse: [
-      [69,_,72,_, 76,_,74,72, 69,_,67,_, 64,_,67,_],
-      [69,_,72,_, 74,_,72,69, 67,_,64,_, 62,_,64,_],
-      [72,_,74,_, 76,_,79,76, 74,_,72,_, 69,_,72,_],
-      [74,72,69,_, 67,_,69,67, 64,_,62,_, 60,_,62,64],
-    ],
-    chorus: [
-      [76,74,72,74, 76,76,_,72, 74,72,69,72, 74,_,_,_],
-      [77,76,74,76, 77,77,_,74, 76,74,72,74, 76,_,_,_],
-      [79,_,76,_, 74,76,74,72, 69,_,72,_, 74,_,76,_],
-      [77,_,74,_, 72,74,72,69, 67,_,69,_, 64,_,67,_],
-    ],
-    outro: [[69,_,_,_, 64,_,_,_, 67,_,_,_, 64,_,62,_]],
-  };
-  // 和弦进行 Am - F - C - G：bass 根音 + pad 和弦音
-  const CHORDS = [
-    { r: 45, pad: [57, 64, 72] },
-    { r: 41, pad: [57, 65, 72] },
-    { r: 48, pad: [55, 64, 72] },
-    { r: 43, pad: [55, 62, 71] },
-  ];
-
-  /* ---------- 步进调度 ---------- */
+  /* ---------- 步进调度（随曲目变化） ---------- */
   function scheduleStep(idx, t) {
-    if (TEST_CLOCK) return;            // 测试模式静默：只保留时钟，不合成音频
+    if (TEST_CLOCK || !cur) return;
     const bar = idx >> 4, st = idx & 15;
     const sec = Chart.sectionAt(bar);
-    const chord = CHORDS[bar % 4];
+    const chord = cur.music.chords[bar % 4];
 
     if (sec === 'intro') {
       if (st % 8 === 0) kick(t, 0.8);
@@ -150,18 +127,21 @@ const AudioSys = (() => {
     }
     if (st === 0 && sec !== 'chorus') pad(t, chord.pad, STEP * 16 * 0.95);
 
-    let seq = null, li = 0;
-    if (sec === 'intro')        { seq = LEAD.intro;  li = bar; }
-    else if (sec === 'verse')   { seq = LEAD.verse;  li = (bar - 4)  % 4; }
-    else if (sec === 'chorus')  { seq = LEAD.chorus; li = (bar < 36 ? bar - 20 : bar - 36) % 4; }
-    else                        { seq = LEAD.outro;  li = (bar - 44) % LEAD.outro.length; }
+    const seqBank = cur.music.lead;
+    let seq, li;
+    if (sec === 'intro')       { seq = seqBank.intro;  li = bar; }
+    else if (sec === 'verse')  { seq = seqBank.verse;  li = (bar - 4)  % 4; }
+    else if (sec === 'chorus') { seq = seqBank.chorus; li = (bar < 36 ? bar - 20 : bar - 36) % 4; }
+    else                       { seq = seqBank.outro;  li = (bar - 44) % seqBank.outro.length; }
     const note = seq[li % seq.length][st];
-    if (note) lead(t, F(note), sec === 'chorus' ? 0.16 : 0.2);
+    if (note) lead(t, F(note), sec === 'chorus' ? 0.16 : 0.2, cur.music.wave);
   }
 
   /* ---------- 歌曲控制 ---------- */
-  function startSong(steps) {
+  function startSong(songDef, steps) {
     ensure(); resumeCtx();
+    cur = songDef;
+    STEP = 60 / songDef.bpm / 4;
     totalSteps = steps;
     stepIdx = 0;
     nextStepT = tnow() + 0.4;          // 留 0.4s 缓冲作为歌曲起点
@@ -191,8 +171,8 @@ const AudioSys = (() => {
   const resume = () => {
     if (TEST_CLOCK) {
       if (pausedAt !== null) {
-        // 回推时钟基准，使恢复瞬间 tnow === pausedAt（8 倍速换算）：
-        // pausedAt = testT0' + (nowReal - testT0')*SPEED  →  testT0' = (SPEED*nowReal - pausedAt)/(SPEED-1)
+        // 回推时钟基准，使恢复瞬间 tnow === pausedAt（倍速换算）：
+        // pausedAt = testT0' + (nowReal - testT0')*SPEED
         const nowReal = performance.now() / 1000;
         testT0 = (TEST_SPEED * nowReal - pausedAt) / (TEST_SPEED - 1);
         pausedAt = null;
