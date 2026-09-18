@@ -106,7 +106,7 @@
   const VERSIONS = [
     {
       v: '1.3.0', date: '2026-09-18', name: '雾蓝夜话',
-      link: './', commit: REPO + '/commit/6fc4d2f',
+      link: './', commit: REPO + '/commit/08bfcd8',
       notes: [
         '新曲目「雾蓝 Swag」——SWAG 系列美学致敬：极简黑封面语言、雾蓝私密度假夜',
         'R&B 编曲引擎：808 长低音、摇摆 hi-hat、切分底鼓、激光合成器扫频',
