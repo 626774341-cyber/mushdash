@@ -99,25 +99,6 @@ canvas { width: 100%; height: 100%; display: block; border-radius: 14px; box-sha
 }
 .ver-notes li::before { content: "▸"; position: absolute; left: 2px; color: #ffd23e; }
 
-.ver-links { display: flex; gap: 10px; margin-top: 11px; }
-.ver-play, .ver-src {
-  font-size: 12.5px; font-weight: 800; text-decoration: none;
-  padding: 5px 16px; border-radius: 999px;
-  transition: all .15s;
-}
-.ver-play {
-  color: #1c1028;
-  background: linear-gradient(160deg, #7ee787, #3ecf5a);
-  box-shadow: 0 3px 0 rgba(0,0,0,.25);
-}
-.ver-play:hover { transform: translateY(-2px); filter: brightness(1.08); }
-.ver-src {
-  color: #c9b8e8;
-  border: 2px solid rgba(255,255,255,.25);
-  background: rgba(255,255,255,.07);
-}
-.ver-src:hover { color: #fff; background: rgba(255,255,255,.16); }
-
 /* ---------- 通用按钮 ---------- */
 .big-btn {
   padding: 14px 52px; font-size: 25px; font-weight: 900; letter-spacing: 4px;
