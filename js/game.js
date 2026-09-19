@@ -64,6 +64,8 @@
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = W * DPR; canvas.height = H * DPR;
   const $ = id => document.getElementById(id);
+  const dcv = document.getElementById('danceCanvas');
+  const dctx = dcv ? dcv.getContext('2d') : null;
   const screens = {
     title: $('titleScreen'), lobby: $('lobbyScreen'),
     pause: $('pauseScreen'), result: $('resultScreen'),
@@ -1364,10 +1366,6 @@
     const C = charCfg || CHARACTERS[0];
     const act = player.actT > 0;
     const holding = hold.enemy !== null;          // 正在长按菇霸
-    // 结算舞台：通关谢幕跳舞（等级越高越疯狂），失败则低头沮丧
-    const onStage = state === 'result' && !!resultInfo;
-    const encore = onStage && resultInfo.clear;
-    const sad = onStage && !resultInfo.clear;
     const attacking = act || holding;
     const ph = act ? 1 - player.actT / ACT_DUR : 0.45;
     const dir = player.actT > 0 ? (player.actTrack === 'A' ? 1 : -1)
@@ -1380,8 +1378,7 @@
     if (!pf) return;
     const u = pf.s / PPU;
 
-    const faceTarget = sad ? 0.55 : (attacking || holding) ? 0.05 : 1;
-    faceTurn += (faceTarget - faceTurn) * 0.14;
+    faceTurn += ((attacking ? 0.05 : 1) - faceTurn) * 0.14;
 
     // 接地阴影
     ctx.save();
@@ -1394,13 +1391,9 @@
     ctx.restore();
 
     const run = !attacking;
-    const danceE = encore ? (resultInfo.rank === 'S' ? 1.6 : resultInfo.rank === 'A' ? 1.25 : 1) : 0;
-    let bounce = run ? Math.abs(Math.sin(t * 9)) * 8 : 0;
-    if (encore) bounce = Math.abs(Math.sin(t * 6.5)) * 12 * danceE;
-    if (sad) bounce = 0;
+    const bounce = run ? Math.abs(Math.sin(t * 9)) * 8 : 0;
     const hop = act ? Math.sin(ph * Math.PI) * 16
               : holding ? Math.sin(t * 10) * 3 + 8   // 按住时压低重心发力
-              : encore ? Math.sin(t * 13) * 5 * danceE
               : 0;
     const lp = t * 13;
     const hurtBlink = player.hurtT > 0 && Math.floor(player.hurtT * 18) % 2 === 0;
@@ -1409,8 +1402,6 @@
     ctx.translate(pf.x, pf.y);
     ctx.scale(u, u);
     ctx.rotate(player.leanX * 0.09);            // 侧步倾斜
-    if (encore) ctx.rotate(Math.sin(t * 3.2) * 0.1 * danceE);   // 跳舞转圈感
-    if (sad) ctx.rotate(0.15);                                  // 失败低头垂丧
     ctx.translate(0, -bounce - hop);
     if (hurtBlink) ctx.globalAlpha = 0.45;
 
@@ -1743,6 +1734,8 @@
     ctx.restore();
     // FEVER：舞台灯光秀（顶部跑马灯 + 双探照灯扫场，半透明不挡视野）
     if (feverMix > 0) drawStageLights(t, feverMix);
+    // 结算界面：主人公在特写舞台跳舞（等级越高越热烈）
+    if (state === 'result' && dctx) drawResultDancer(perfT);
     // FEVER：全屏霓虹灯框（色相轮转 + 呼吸闪烁）
     if (feverMix > 0) {
       const hue = Math.round((perfT * 160) % 360);
@@ -1819,6 +1812,98 @@
       }
     }
     ctx.restore();
+  }
+
+  // ---------- 结算界面特写：主人公正面跳舞（S 级戴金冠，失败垂泪） ----------
+  function drawResultDancer(t) {
+    if (!dctx || !resultInfo) return;
+    const c = dctx;
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.clearRect(0, 0, dcv.width, dcv.height);
+    const rank = resultInfo.rank;
+    const sad = !resultInfo.clear;
+    const E = sad ? 0 : rank === 'S' ? 1.6 : rank === 'A' ? 1.25 : rank === 'B' ? 0.95 : 0.7;
+    const cx = dcv.width / 2, gy = dcv.height - 36;
+    const u = 1.35;
+    c.globalAlpha = 0.22; c.fillStyle = '#2a1040';
+    c.beginPath(); c.ellipse(cx, gy + 6, 42, 9, 0, 0, TAU); c.fill();
+    c.globalAlpha = 1;
+    c.save();
+    c.translate(cx + Math.sin(t * 2.1) * 9 * E, gy);
+    c.rotate(Math.sin(t * 2.1) * 0.06 * E);
+    c.scale(u, u);
+    const bounce = Math.abs(Math.sin(t * 6.5)) * 9 * (0.3 + 0.7 * E);
+    c.translate(0, -bounce);
+    const kick = Math.sin(t * 6.5) * 8 * E;
+    c.strokeStyle = '#ffe9dc'; c.lineWidth = 6.5; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(-8, -32); c.lineTo(-10, -6 - Math.max(0, kick)); c.stroke();
+    c.beginPath(); c.moveTo(8, -32); c.lineTo(10, -6 - Math.max(0, -kick)); c.stroke();
+    c.fillStyle = '#ff5f6d';
+    c.beginPath(); c.ellipse(-10, -4 - Math.max(0, kick), 8, 4.5, 0, 0, TAU); c.fill();
+    c.beginPath(); c.ellipse(10, -4 - Math.max(0, -kick), 8, 4.5, 0, 0, TAU); c.fill();
+    c.fillStyle = '#fff';
+    c.beginPath();
+    c.moveTo(-16, -34);
+    c.quadraticCurveTo(-19, -56, -12, -68);
+    c.lineTo(12, -68);
+    c.quadraticCurveTo(19, -56, 16, -34);
+    c.quadraticCurveTo(0, -26, -16, -34);
+    c.fill();
+    c.strokeStyle = '#ffe9dc'; c.lineWidth = 6; c.lineCap = 'round';
+    if (!sad) {
+      const wv = Math.sin(t * 9) * 0.4;
+      c.save(); c.translate(-13, -62); c.rotate(-2.1 + wv);
+      c.beginPath(); c.moveTo(0, 0); c.lineTo(0, -18); c.stroke(); c.restore();
+      c.save(); c.translate(13, -62); c.rotate(2.1 - wv);
+      c.beginPath(); c.moveTo(0, 0); c.lineTo(0, -18); c.stroke(); c.restore();
+    } else {
+      c.beginPath(); c.moveTo(-13, -62); c.lineTo(-19, -46); c.stroke();
+      c.beginPath(); c.moveTo(13, -62); c.lineTo(19, -46); c.stroke();
+    }
+    c.fillStyle = '#ffe9dc';
+    c.beginPath(); c.arc(0, -84, 19, 0, TAU); c.fill();
+    if (sad) {
+      c.strokeStyle = '#3a2340'; c.lineWidth = 2.2;
+      c.beginPath(); c.arc(-6.5, -86, 3.2, 0.1 * Math.PI, 0.9 * Math.PI); c.stroke();
+      c.beginPath(); c.arc(6.5, -86, 3.2, 0.1 * Math.PI, 0.9 * Math.PI); c.stroke();
+      c.fillStyle = 'rgba(140,200,255,0.9)';
+      c.beginPath(); c.ellipse(13, -78, 2.6, 3.6, 0.3, 0, TAU); c.fill();
+    } else {
+      c.strokeStyle = '#3a2340'; c.lineWidth = 2.2;
+      c.beginPath(); c.arc(-6, -87, 3.2, Math.PI * 1.1, Math.PI * 1.9); c.stroke();
+      c.beginPath(); c.arc(6, -87, 3.2, Math.PI * 1.1, Math.PI * 1.9); c.stroke();
+      c.fillStyle = 'rgba(255,110,130,0.85)';
+      c.beginPath(); c.ellipse(0, -79, 3.4, 2.6, 0, 0, TAU); c.fill();
+    }
+    c.fillStyle = 'rgba(255,150,160,0.55)';
+    c.beginPath(); c.arc(-11, -83, 3, 0, TAU); c.fill();
+    c.beginPath(); c.arc(11, -83, 3, 0, TAU); c.fill();
+    c.fillStyle = '#ff5f6d';
+    c.beginPath(); c.arc(0, -98, 25, Math.PI, 0);
+    c.quadraticCurveTo(0, -85, -25, -98);
+    c.closePath(); c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.85)';
+    c.beginPath(); c.arc(-9, -106, 4.2, 0, TAU); c.fill();
+    c.beginPath(); c.arc(8, -112, 3.4, 0, TAU); c.fill();
+    if (rank === 'S') {
+      c.save();
+      c.translate(0, -116);
+      c.fillStyle = '#ffd23e';
+      c.strokeStyle = '#e8a01f'; c.lineWidth = 1.6;
+      c.beginPath();
+      c.moveTo(-16, 8); c.lineTo(-19, -8); c.lineTo(-10, -2); c.lineTo(0, -14);
+      c.lineTo(10, -2); c.lineTo(19, -8); c.lineTo(16, 8);
+      c.closePath(); c.fill(); c.stroke();
+      c.fillStyle = '#ff5f6d';
+      c.beginPath(); c.arc(0, 0, 2.8, 0, TAU); c.fill();
+      c.restore();
+    }
+    for (let i = 0; i < 6; i++) {
+      const a = t * 2.4 + i * TAU / 6;
+      drawStar(c, cx + Math.cos(a) * (60 + 6 * Math.sin(t * 3 + i)), gy - 96 + Math.sin(a * 1.7) * 30,
+               4.5 + 1.5 * Math.sin(t * 5 + i * 2), '#ffd23e', null);
+    }
+    c.restore();
   }
 
   // ---------- 主循环 ----------
